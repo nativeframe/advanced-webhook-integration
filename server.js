@@ -12,7 +12,7 @@ const names = [
 	'Richard',
 ];
 
-module.exports.getRandom = function getRandom() {
+const getRandomName = function getRandom() {
 	return names[Math.floor(Math.random() * names.length)];
 };
 
@@ -32,10 +32,10 @@ const broadcastBegin = async (req, res) => {
     privateKey: req.params.privateKey
   });
 	const resp = {
-		broadcasterProfile: "", // optional profile that customizes transcoder settings
-		needsAuth: false, // whether the broadcast needs to authenticate for the playback
-		publicKey: uuidv4(), // public key for the broadcast
-		userSlug: `user${names.getRandom()}${Math.floor(Math.random() * 10)}`, // optional unique username for the broadcast
+		broadcasterProfile: null, // optional profile name that customizes transcoder settings
+		needsAuth: false, // set true if the broadcast needs authenticate for viewer playback
+		publicKey: uuidv4(), // public key for the broadcast viewer playback
+		userSlug: `user${getRandomName()}${Math.floor(Math.random() * 10)}`, // optional unique username for the broadcast
 	};
 	res.status(200).send(resp);
 };
@@ -86,27 +86,27 @@ const bulkPing = async (req, res) => {
 			statusCode: 200,
 			status: 'OK',
 			message: 'Broadcast can continue',
-			needsAuth: false, // whether the broadcast needs to authenticate for the playback
-			broadcasterProfile: "", // optional profile for transcoding profile
+			needsAuth: false, // set true if the broadcast needs authenticate for viewer playback
+			broadcasterProfile: null, // optional profile name that customizes transcoder settings
 		};
 	});
 	return res.status(200).send(resp);
 };
 
 // called on broadcast start; ensure the privateKey is allowed to begin
-app.put('/apps/demos/api/v1/broadcast/:privateKey', broadcastBegin);
+app.put('/integration/v1/broadcast/:privateKey', broadcastBegin);
 
 // called on broadcast end; mark stream as completed
-app.delete('/apps/demos/api/v1/broadcast/:privateKey', broadcastEnd);
+app.delete('/integration/v1/broadcast/:privateKey', broadcastEnd);
 
-// called when a format/variant becomes available
-app.put('/apps/demos/api/v1/broadcast/:privateKey/encoding/:encoding', formatBegin);
+// called when a transcoding variant becomes available
+app.put('/integration/v1/broadcast/:privateKey/encoding/:encoding', formatBegin);
 
-// called when a format/variant becomes unavailable
-app.delete('/apps/demos/api/v1/broadcast/:privateKey/encoding/:encoding', formatEnd);
+// called when a transcoding variant becomes unavailable
+app.delete('/integration/api/v1/broadcast/:privateKey/encoding/:encoding', formatEnd);
 
 // called periodically to check if broadcasts have changed state
-app.put('/apps/demos/api/v1/broadcast/ping/bulk', bulkPing);
+app.put('/integration/v1/broadcast/ping/bulk', bulkPing);
 
 // Start the server
 app.listen(PORT, () => {
