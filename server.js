@@ -1,4 +1,4 @@
-// Import the express module
+// Description: Example integration server for broadcast webhooks
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
@@ -12,6 +12,7 @@ const names = [
 	'Richard',
 ];
 
+// Get a random name
 const getRandomName = function getRandom() {
 	return names[Math.floor(Math.random() * names.length)];
 };
@@ -21,11 +22,6 @@ const app = express();
 
 // Define a port
 const PORT = process.env.PORT || 3000;
-
-// Define a simple route
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
 
 const broadcastBegin = async (req, res) => {
 	console.log('integration broadcastBegin', {
@@ -93,19 +89,19 @@ const bulkPing = async (req, res) => {
 	return res.status(200).send(resp);
 };
 
-// called on broadcast start; ensure the privateKey is allowed to begin
+// Called on broadcast start; Ensure the privateKey is allowed to begin
 app.put('/integration/v1/broadcast/:privateKey', broadcastBegin);
 
-// called on broadcast end; mark stream as completed
+// Called on broadcast end; Mark broadcast as completed
 app.delete('/integration/v1/broadcast/:privateKey', broadcastEnd);
 
-// called when a transcoding variant becomes available
+// Called when a transcoding variant becomes available; Indetifies that viewer manifest is ready
 app.put('/integration/v1/broadcast/:privateKey/encoding/:encoding', formatBegin);
 
-// called when a transcoding variant becomes unavailable
+// Called when a transcoding variant becomes unavailable
 app.delete('/integration/api/v1/broadcast/:privateKey/encoding/:encoding', formatEnd);
 
-// called periodically to check if broadcasts have changed state
+// Called periodically to check if broadcasts have changed state
 app.put('/integration/v1/broadcast/ping/bulk', bulkPing);
 
 // Start the server
