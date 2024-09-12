@@ -2,6 +2,7 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
+// list of example names
 const names = [
 	'James',
 	'John',
@@ -17,19 +18,13 @@ const getRandomName = function getRandom() {
 	return names[Math.floor(Math.random() * names.length)];
 };
 
-// Create an instance of express
-const app = express();
-
-// Define a port
-const PORT = process.env.PORT || 3000;
-
 const broadcastBegin = async (req, res) => {
 	console.log('integration broadcastBegin', {
     privateKey: req.params.privateKey
   });
 	const resp = {
 		broadcasterProfile: null, // optional profile name that customizes transcoder settings
-		needsAuth: false, // set true if the broadcast needs authenticate for viewer playback
+		needsAuth: false, // set true if the broadcast needs authentication for viewer playback
 		publicKey: uuidv4(), // public key for the broadcast viewer playback
 		userSlug: `user${getRandomName()}${Math.floor(Math.random() * 10)}`, // optional unique username for the broadcast
 	};
@@ -82,12 +77,18 @@ const bulkPing = async (req, res) => {
 			statusCode: 200,
 			status: 'OK',
 			message: 'Broadcast can continue',
-			needsAuth: false, // set true if the broadcast needs authenticate for viewer playback
+			needsAuth: false, // set true if the broadcast needs authentication for viewer playback
 			broadcasterProfile: null, // optional profile name that customizes transcoder settings
 		};
 	});
 	return res.status(200).send(resp);
 };
+
+// Create express instance
+const app = express();
+
+// Define express port
+const PORT = process.env.PORT || 3000;
 
 // Called on broadcast start; Ensure the privateKey is allowed to begin
 app.put('/integration/v1/broadcast/:privateKey', broadcastBegin);
@@ -99,7 +100,7 @@ app.delete('/integration/v1/broadcast/:privateKey', broadcastEnd);
 app.put('/integration/v1/broadcast/:privateKey/encoding/:encoding', formatBegin);
 
 // Called when a transcoding variant becomes unavailable
-app.delete('/integration/api/v1/broadcast/:privateKey/encoding/:encoding', formatEnd);
+app.delete('/integration/v1/broadcast/:privateKey/encoding/:encoding', formatEnd);
 
 // Called periodically to check if broadcasts have changed state
 app.put('/integration/v1/broadcast/ping/bulk', bulkPing);
