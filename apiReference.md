@@ -48,7 +48,7 @@ DELETE - {host}/integration/v1/broadcast/{privateKey}
 Called when a `format` encoding (aka: variants) becomes available
 
 ```js
-PUT - {host}/v1/integration/broadcast/{streamKey}/encoding/{format}
+PUT - {host}integration/v1/broadcast/{streamKey}/encoding/{format}
 // Note: streamKey is sometimes referred to as privateKey
 
 // Request payload:
