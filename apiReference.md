@@ -20,7 +20,7 @@ PUT - {host}/integration/v1/broadcast/{privateKey}
 
 // Response: 200
 {
-  userSlug: 'userHenry82',       // Random user name assigned by demo-api
+  userSlug: 'userHenry82',       // slugified unique user name
   broadcasterProfile: 'high',    // Profile name to use for transcoding (optional)
   needsAuth: true,               // Authorization state (indicates if authorization is required for playback)
   publicKey: 'foo',              // The key to use when calling for the manifest for viewer playback
